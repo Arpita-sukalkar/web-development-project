@@ -69,7 +69,7 @@ public class Patient {
     @Column(name = "bed_number", length = 50)
     private String bedNumber;
 
-    @Column(name = "triage_notes", columnDefinition = "NVARCHAR(MAX)")
+    @Column(name = "triage_notes", columnDefinition = "TEXT")
     private String triageNotes;
 
     @Column(name = "avatar_url", length = 500)

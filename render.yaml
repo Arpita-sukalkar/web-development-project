@@ -1,0 +1,68 @@
+# ==============================================================================
+# Render Blueprint Specification for CarePulse HMS
+# Full-Stack Deployment: PostgreSQL + Spring Boot Backend + React Frontend
+# Docs: https://render.com/docs/blueprint-spec
+# ==============================================================================
+version: "1"
+
+databases:
+  # ----------------------------------------------------------------------------
+  # Managed PostgreSQL Database (Free Tier)
+  # ----------------------------------------------------------------------------
+  - name: carepulse-hms-db
+    databaseName: hospital_db
+    user: hospital_user
+    plan: free
+    region: oregon
+    ipAllowList: [] # Allows connections from all internal and external services
+
+services:
+  # ----------------------------------------------------------------------------
+  # Backend Web Service (Spring Boot Docker Container)
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: carepulse-hms-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    region: oregon
+    branch: main
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: SPRING_PROFILES_ACTIVE
+        value: postgres
+      - key: DATABASE_URL
+        fromDatabase:
+          name: carepulse-hms-db
+          property: connectionString
+      - key: CORS_ALLOWED_ORIGINS
+        value: http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,https://*.onrender.com
+      - key: APP_JWT_SECRET
+        generateValue: true
+      - key: APP_JWT_EXPIRATION_MS
+        value: 86400000
+
+  # ----------------------------------------------------------------------------
+  # Frontend Static Site (React 18 + Vite 5 SPA)
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: carepulse-hms-frontend
+    runtime: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    plan: free
+    region: oregon
+    branch: main
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: carepulse-hms-backend
+          property: host

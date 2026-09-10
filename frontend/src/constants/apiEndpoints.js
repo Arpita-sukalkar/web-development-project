@@ -1,4 +1,27 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+/**
+ * Normalizes the API Base URL from the environment or fallback.
+ * - Trims whitespace and trailing slashes.
+ * - Prepends 'https://' if protocol is omitted (e.g. Render hostname).
+ * - Strips trailing '/api' because individual endpoint paths already include '/api'.
+ * - Preserves empty string for local development so Vite's dev proxy handles '/api'.
+ */
+export const normalizeApiBaseUrl = (rawUrl) => {
+  const urlCandidate = rawUrl !== undefined && rawUrl !== null ? String(rawUrl).trim() : '';
+  if (!urlCandidate || urlCandidate === '/api' || urlCandidate === '/') {
+    return '';
+  }
+
+  let normalized = urlCandidate.replace(/\/+$/, '');
+  if (!normalized.startsWith('http://') && !normalized.startsWith('https://') && !normalized.startsWith('/')) {
+    normalized = `https://${normalized}`;
+  }
+  if (normalized.endsWith('/api')) {
+    normalized = normalized.slice(0, -4);
+  }
+  return normalized;
+};
+
+export const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL || '/api');
 
 export const ENDPOINTS = {
   AUTH: {

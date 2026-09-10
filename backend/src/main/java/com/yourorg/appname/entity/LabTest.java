@@ -39,7 +39,7 @@ public class LabTest {
     @Column(nullable = false, length = 50)
     private String status = "PENDING";
 
-    @Column(name = "result_summary", columnDefinition = "NVARCHAR(MAX)")
+    @Column(name = "result_summary", columnDefinition = "TEXT")
     private String resultSummary;
 
     @Column(name = "reference_range", length = 255)
