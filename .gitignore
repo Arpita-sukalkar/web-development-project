@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Production / Build output
+target/
+backend/target/
+dist/
+frontend/dist/
+
+# Environment files
+.env.local
+.env.*.local
+
+# IDE & OS files
+.idea/
+*.iml
+.vscode/
+*.log
+.DS_Store
+Thumbs.db
+
+# Keep .env.example
+!.env.example
+!frontend/.env.example
